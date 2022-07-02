@@ -39,6 +39,22 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
       //console.log('replaced: ', localImageRepo);
       
       res.status(200).send({message: localImageRepo})
+      //res.status(200).sendFile(localImageRepo)
+
+      /*
+      app.get('/user/:uid/photos/:file', function(req, res){
+        var uid = req.params.uid
+          , file = req.params.file;
+
+        req.user.mayViewFilesFrom(uid, function(yes){
+          if (yes) {
+            res.sendFile('/uploads/' + uid + '/' + file);
+          } else {
+            res.send(403, 'Sorry! you cant see that.');
+          }
+        });
+      });
+      */
 
       //const localImageRepoArray = localImageRepo.split('/')
       //console.log('split repo: ', localImageRepoArray);
