@@ -18,19 +18,17 @@ import { nextTick } from 'process';
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
   app.get('/filteredimage', async function(req, res) {
-    const page_url = req.query.image_url;
+    const page_url: string = req.query.image_url;
     if (!page_url) {
       return res.status(400).send({message: 'page_url query missing'})
     }
     try {
-      const localImageRepo = await filterImageFromURL(page_url)
-      //console.log('local image repo: ', localImageRepo);
+      const localImageRepo: string = await filterImageFromURL(page_url)
       res.status(200).sendFile(localImageRepo, function (err) {
         if (err) {
           console.log('err: ', err);
           try {
             deleteLocalFiles([localImageRepo])
-            //console.log('image deleted 101: ');
           } catch (error) {
             console.log('err deleting file. code: 101');
           }
@@ -38,7 +36,6 @@ import { nextTick } from 'process';
           console.log('Sent: ', localImageRepo);
           try {
             deleteLocalFiles([localImageRepo])
-            //console.log('image deleted: ');
           } catch (error) {
             console.log('err deleting file. code:102');
           }
