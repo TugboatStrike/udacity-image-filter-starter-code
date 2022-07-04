@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { nextTick } from 'process';
 
 (async () => {
 
@@ -21,70 +22,33 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
     if (!page_url) {
       return res.status(400).send({message: 'page_url query missing'})
     }
-    console.log('chopped url: ', page_url.substr(page_url.length -4));
-    
-    console.log('url: ', page_url);
-
-    /*
-    const testFilt = filterImageFromURL(page_url)
-      .then((infoTest) => console.log('info success: ', infoTest))
-      .catch(err => console.log('err: ', err))
-    console.log('test info: ', testFilt);
-    */
-
     try {
       const localImageRepo = await filterImageFromURL(page_url)
-      console.log('local image repo: ', localImageRepo);
-      //localImageRepo.replace(`\\`, '/')
-      //console.log('replaced: ', localImageRepo);
-      
-      res.status(200).send({message: localImageRepo})
-      //res.status(200).sendFile(localImageRepo)
-
-      /*
-      app.get('/user/:uid/photos/:file', function(req, res){
-        var uid = req.params.uid
-          , file = req.params.file;
-
-        req.user.mayViewFilesFrom(uid, function(yes){
-          if (yes) {
-            res.sendFile('/uploads/' + uid + '/' + file);
-          } else {
-            res.send(403, 'Sorry! you cant see that.');
+      //console.log('local image repo: ', localImageRepo);
+      res.status(200).sendFile(localImageRepo, function (err) {
+        if (err) {
+          console.log('err: ', err);
+          try {
+            deleteLocalFiles([localImageRepo])
+            //console.log('image deleted 101: ');
+          } catch (error) {
+            console.log('err deleting file. code: 101');
           }
-        });
-      });
-      */
-
-      //const localImageRepoArray = localImageRepo.split('/')
-      //console.log('split repo: ', localImageRepoArray);
-      try {
-        deleteLocalFiles([localImageRepo])
-        console.log('image deleted: ');
-        
-      } catch (error) {
-        console.log('err deleting file');
-        
-      }
-      
-      
+        } else {
+          console.log('Sent: ', localImageRepo);
+          try {
+            deleteLocalFiles([localImageRepo])
+            //console.log('image deleted: ');
+          } catch (error) {
+            console.log('err deleting file. code:102');
+          }
+        }
+      })
     } catch (error) {
       console.log('err of try: ', error);
       res.status(400).send({message: 'Image was not found!'})
-      
     }
-    
-    //console.log('local image repo outside try', localImageRepo);
-    
-    //const testFilt = await filterImageFromURL(page_url)
-    //  .then(infoTest => console.log('infoTest: ', infoTest))
-    //  .catch(err => console.log('err: ', err))
-    //console.log('filter image: ', testFilt)
-    
-    //res.status(200).send({ message: `got url: ${page_url}`})
-    
   })
-
 
   // IT SHOULD
   //    1
